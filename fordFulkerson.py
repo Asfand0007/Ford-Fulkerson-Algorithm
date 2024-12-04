@@ -108,25 +108,36 @@ class FordFulkersonAlgorithm:
     def maximumFlow(self):
         self.augumentedPaths(self.src, self.dest, self.graph)
         maxFlow = 0
+        flows=[]
+        # finding initial flow
+        for node, edges  in self.graph.items():
+            for i in range(1,len(edges)):
+                if(edges[i][0]==self.dest):
+                    maxFlow+=edges[i][2]
+        flows.append(maxFlow)
+        
         for p in self.augPaths:
             mini = []
             for j in range(1, len(p)):
-                mini.append(p[j][1])
+                mini.append(p[j][1]-p[j][2])
+                # mini.append(p[j][1])
             mini = min(mini)
             if self.checkPath(p, self.graph, mini):
                 maxFlow += mini
+                flows.append(maxFlow)
                 for j in range(len(p)-1):
                     self.updateWeigth(p[j][0] , p[j+1][0],mini)
                 self.createGraph(self.graph, p)
         self.createGraph(self.graph,None,1)
-        return maxFlow
+        flows.append(flows[-1]) #adding max flow to the last element again
+        return flows
 
 
 if __name__ == '__main__':
     graph = {
     'A': [False,['B',10,0],['C',10,0]],
     'B': [False,['D',4,0],['E',8,0]],
-    'C': [False,['F',9,0]],
+    'C': [False,['F',9,5]],
     'D': [False,['F',10,0]],
     'E': [False,['D', 6,0],['F',10,0]],
     'F': [False]
@@ -134,7 +145,7 @@ if __name__ == '__main__':
     src = 'A'
     dest = 'F'
     obj = FordFulkersonAlgorithm(src, dest, graph)
-    print( "Maximum Flow = ", obj.maximumFlow())
+    print( "Maximum Flow = ", obj.maximumFlow()[-1])
 
 
     # print graphs
